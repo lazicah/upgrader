@@ -8,6 +8,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:native_updater/native_updater.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -118,6 +119,9 @@ class Upgrader with WidgetsBindingObserver {
   /// Hide or show Ignore button on dialog (default: true)
   bool showIgnore;
 
+  /// Hide or show Native uploader Android (default: true)
+  bool showNativeUpdater;
+
   /// Hide or show Later button on dialog (default: true)
   bool showLater;
 
@@ -184,6 +188,7 @@ class Upgrader with WidgetsBindingObserver {
     this.countryCode,
     this.languageCode,
     this.minAppVersion,
+    this.showNativeUpdater = true,
     this.dialogStyle = UpgradeDialogStyle.material,
     this.cupertinoButtonTextStyle,
     UpgraderOS? upgraderOS,
@@ -467,13 +472,19 @@ class Upgrader with WidgetsBindingObserver {
       }
       if (shouldDisplay) {
         _displayed = true;
+
         Future.delayed(const Duration(milliseconds: 0), () {
-          _showDialog(
-              context: context,
-              title: messages.message(UpgraderMessage.title),
-              message: message(),
-              releaseNotes: shouldDisplayReleaseNotes() ? _releaseNotes : null,
-              canDismissDialog: canDismissDialog);
+          if (showNativeUpdater) {
+            _showNativeUpdater(context);
+          } else {
+            _showDialog(
+                context: context,
+                title: messages.message(UpgraderMessage.title),
+                message: message(),
+                releaseNotes:
+                    shouldDisplayReleaseNotes() ? _releaseNotes : null,
+                canDismissDialog: canDismissDialog);
+          }
         });
       }
     }
@@ -621,6 +632,13 @@ class Upgrader with WidgetsBindingObserver {
     }
     final code = locale == null ? 'en' : locale.languageCode;
     return code;
+  }
+
+  void _showNativeUpdater(BuildContext context) {
+    NativeUpdater.displayUpdateAlert(
+      context,
+      forceUpdate: true,
+    );
   }
 
   void _showDialog(
