@@ -42,7 +42,7 @@ dependencies:
   # A flutter library for display native updater on android
   native_updater:
     git: 
-      url: https://github.com/Heatclift/native_updater.git
+      url: https://github.com/benthemobileguy/native_updater.git
 
 dev_dependencies:
   flutter_test:
